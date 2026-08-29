@@ -25,14 +25,14 @@
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
-body::after{content:"";position:fixed;inset:0;background:radial-gradient(1100px 520px at 72% -12%,rgba(138,43,225,.16),transparent 58%),radial-gradient(800px 500px at -8% 108%,rgba(138,43,225,.07),transparent 60%);pointer-events:none;z-index:0}
+body::after{content:"";position:fixed;inset:0;background:radial-gradient(1100px 520px at 72% -12%,rgba(138,43,225,.16),transparent 58%),radial-gradient(800px 500px at -8% 108%,rgba(138,43,225,.07),transparent 60%);pointer-events:none;z-index:-1}
 button{font-family:'Inter',sans-serif;cursor:pointer}
 a{color:inherit;text-decoration:none}
 .mono{font-family:var(--mono)}
 .up{color:var(--green)}.dn{color:var(--red)}
 
 /* ===== shell ===== */
-.app{display:flex;min-height:100vh;position:relative;z-index:1}
+.app{display:flex;min-height:100vh;position:relative}
 .side{width:250px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
 .logo{font-size:21px;font-weight:800;letter-spacing:-.02em;padding:0 12px;margin-bottom:28px}
 .logo span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -234,6 +234,29 @@ canvas{width:100%;height:300px;display:block}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.win{border-color:var(--green)}.toast.lose{border-color:var(--red)}
 
+.handle{display:none}
+.sheetbg{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:55;display:none}
+.sheetbg.on{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media(min-width:881px){
+  body.detail-open .acct{display:none}
+  .sheetbg{display:none!important}
+}
+@media(max-width:880px){
+  #pageDetail{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--bg2);border-top:1px solid var(--border2);border-radius:20px 20px 0 0;max-height:90vh;overflow-y:auto;padding:8px 18px 26px;box-shadow:0 -18px 60px rgba(0,0,0,.6)}
+  #pageDetail.on{animation:sheetUp .32s cubic-bezier(.22,.9,.3,1)}
+  @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .handle{display:block;width:42px;height:4px;border-radius:99px;background:rgba(255,255,255,.18);margin:6px auto 12px}
+  #pageDetail .back{display:none}
+  #pageDetail .dhead h2{font-size:15.5px}
+  #pageDetail .dhead .cic.icw{width:32px;height:32px}
+  #pageDetail .dhead .sub{display:none}
+  #pageDetail canvas{height:160px}
+  #pageDetail .chartbox{padding:12px}
+  #pageDetail .chartbox .cp .px{font-size:18px}
+  #pageDetail .tpanel{padding:14px;border:none;background:none}
+  body.detail-open{overflow:hidden}
+}
 @media(max-width:900px){.side{display:none}.acct>div{border-left:none!important;padding:0 14px 0 0}.ml{min-width:100%;margin-top:10px;padding:0!important}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -293,6 +316,7 @@ canvas{width:100%;height:300px;display:block}
 
       <!-- ============ PAGE 2 ============ -->
       <div class="page" id="pageDetail">
+        <div class="handle"></div>
         <button class="back" onclick="goList()">← All markets</button>
         <div class="dhead">
           <div class="cic" id="dIc"></div>
@@ -335,6 +359,7 @@ canvas{width:100%;height:300px;display:block}
   </div>
 </div>
 
+<div class="sheetbg" id="sheetBg" onclick="goList()"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -484,22 +509,27 @@ function checkQuestions(){
   if(changed&&!state.activeQ) renderQuestions();
 }
 
+const isMobile=()=>window.matchMedia('(max-width:880px)').matches;
 function openQ(id,side){
   state.activeQ=QUESTIONS.find(q=>q.id===id);
   state.selSide=side||null;
   const q=state.activeQ;
-  document.getElementById('pageList').classList.remove('on');
+  if(!isMobile()) document.getElementById('pageList').classList.remove('on');
   document.getElementById('pageDetail').classList.add('on');
+  document.getElementById('sheetBg').classList.add('on');
+  document.body.classList.add('detail-open');
   document.getElementById('pageTitle').textContent='Prediction Market · '+q.coin;
   document.getElementById('dIc').className='cic icw';
   document.getElementById('dIc').innerHTML=ICON[q.coin];
   document.getElementById('dQ').innerHTML=`Will ${NAME[q.coin]} touch <b class="pup">${fp(q.coin,q.upT)}</b> or <b class="pdn">${fp(q.coin,q.dnT)}</b> first ${q.tf.when}?`;
   document.getElementById('dSub').textContent=`First price touched wins`;
-  renderDetail(); window.scrollTo({top:0});
+  renderDetail(); if(!isMobile()) window.scrollTo({top:0});
 }
 function goList(){
   state.activeQ=null;
   document.getElementById('pageDetail').classList.remove('on');
+  document.getElementById('sheetBg').classList.remove('on');
+  document.body.classList.remove('detail-open');
   document.getElementById('pageList').classList.add('on');
   document.getElementById('pageTitle').textContent='Prediction Market';
   renderQuestions();
