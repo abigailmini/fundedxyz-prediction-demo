@@ -117,14 +117,27 @@ a{color:inherit;text-decoration:none}
 .qhead .cic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:9px;font-weight:700;flex-shrink:0}
 .qtitle{font-size:14.5px;font-weight:700;line-height:1.4;flex:1}
 .qtitle .pup,.dhead .pup,.qtitle .pdn,.dhead .pdn{font-family:var(--mono);color:var(--text);font-weight:700}
-.ratio{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:5px;padding:1px 7px}
+.more{font-size:9.5px;font-weight:700;color:var(--text);background:rgba(255,255,255,.09);border:1px solid var(--border2);border-radius:5px;padding:1px 7px;letter-spacing:.02em}
+.qmeta{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:10px;padding:7px 11px;display:flex;flex-direction:column;gap:6px;min-width:170px;flex-shrink:0}
+.qm-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.qm-lb{font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;font-weight:700}
+.qm-tm{font-size:11.5px;font-weight:700;color:var(--text2)}
+.qm-div{height:1px;background:var(--border)}
+.crowd{display:flex;align-items:center;gap:7px;justify-content:flex-end;margin-bottom:2px;min-height:17px}
+.cmeter{width:26px;height:16px;flex-shrink:0}
+.cmeter path{fill:none;stroke-width:4;stroke-linecap:round}
+.cmeter .mb{stroke:rgba(255,255,255,.08)}
+.cmeter .md{stroke:var(--red);opacity:.85}
+.cmeter .mu{stroke:var(--green);opacity:.9}
+.ct{font-size:11px;font-weight:600;color:var(--text2)}
+.ct.up,.ct.dn{color:var(--text2)}
 .qtitle small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted);font-weight:400;margin-top:1px}
 .cdpill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:99px;padding:4px 10px;white-space:nowrap}
 .cdpill .tag{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--muted)}
 .cdpill .tm{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--text2)}
 
 /* race track — signature element */
-.race{position:relative;height:46px;margin:0 4px}
+.race{position:relative;height:46px;margin:6px 4px 0}
 .race .rail{position:absolute;left:0;right:0;top:27px;height:9px;border-radius:99px;overflow:hidden;background:linear-gradient(90deg,rgba(231,76,60,.45),rgba(231,76,60,.10) 38%,rgba(255,255,255,.05) 50%,rgba(0,212,170,.10) 62%,rgba(0,212,170,.45))}
 .race .anchor{position:absolute;left:50%;top:24px;width:2px;height:15px;background:rgba(255,255,255,.22);border-radius:2px}
 .race .dot{position:absolute;top:26px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(168,85,240,.9),0 0 14px rgba(168,85,240,.8);transform:translateX(-50%);transition:left .25s linear;z-index:2}
@@ -255,6 +268,12 @@ canvas{width:100%;height:300px;display:block}
   .sheetbg{display:none!important}
 }
 @media(max-width:880px){
+  .qhead{flex-direction:column;align-items:stretch;gap:9px;margin-bottom:10px}
+  .qmeta{flex-direction:row;justify-content:space-between;align-items:center;min-width:0;padding:6px 11px;gap:12px}
+  .qm-div{display:none}
+  .qm-row{gap:6px;justify-content:flex-start}
+  .qm-row:last-child{justify-content:flex-end}
+  .qtitle{font-size:15px}
   #pageDetail{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--bg2);border-top:1px solid var(--border2);border-radius:20px 20px 0 0;max-height:90vh;overflow-y:auto;padding:8px 18px 26px;box-shadow:0 -18px 60px rgba(0,0,0,.6)}
   #pageDetail.on{animation:sheetUp .32s cubic-bezier(.22,.9,.3,1)}
   @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -333,7 +352,7 @@ canvas{width:100%;height:300px;display:block}
         <div class="dhead">
           <div class="cic" id="dIc"></div>
           <div><h2 id="dQ"></h2><div class="sub" id="dSub"></div></div>
-          <div class="cdpill"><span class="tag">RESOLVES IN</span><span class="tm" id="dCd">—</span></div>
+          <div class="cdpill"><span class="tag">ENDS IN</span><span class="tm" id="dCd">—</span></div>
         </div>
         <div class="dgrid">
           <div class="chartbox">
@@ -413,7 +432,7 @@ const TFS=[
 const QUESTIONS=[];
 for(const coin of Object.keys(state.prices)){
   const a=state.prices[coin];
-  TFS.forEach((tf,i)=>QUESTIONS.push({id:coin+'-q'+i,coin,tf,anchor:a,upT:a*(1+tf.pct),dnT:a*(1-tf.pct),status:'open'}));
+  TFS.forEach((tf,i)=>QUESTIONS.push({id:coin+'-q'+i,coin,tf,anchor:a,upT:a*(1+tf.pct),dnT:a*(1-tf.pct),status:'open',crowdUp:50+(Math.random()<.5?-1:1)*(8+Math.random()*22),traders:Math.round([180,320,520,380][i]*(0.6+Math.random()*0.9))}));
 }
 
 const fmt=(n,d)=>n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -444,8 +463,10 @@ setInterval(()=>{
 function cdTxt(at){
   let s=Math.max(0,Math.floor((at-Date.now())/1000));
   const d=Math.floor(s/86400); s%=86400;
-  const h=String(Math.floor(s/3600)).padStart(2,'0'),m=String(Math.floor(s%3600/60)).padStart(2,'0'),ss=String(s%60).padStart(2,'0');
-  return d>0?`${d}d ${h}:${m}:${ss}`:`${h}:${m}:${ss}`;
+  const h=Math.floor(s/3600), m=String(Math.floor(s%3600/60)).padStart(2,'0'), ss=String(s%60).padStart(2,'0');
+  if(d>0) return `${d}d ${h}h`;
+  if(h>0) return `${h}:${m}:${ss}`;
+  return `${m}:${ss}`;
 }
 setInterval(()=>{
   document.querySelectorAll('[data-cd]').forEach(el=>el.textContent=cdTxt(+el.dataset.cd));
@@ -463,6 +484,7 @@ function renderCoins(){
 }
 function setCoin(c){state.coin=c;renderCoins();renderQuestions();}
 setInterval(renderCoins,1500);
+setInterval(()=>{QUESTIONS.forEach(q=>{q.crowdUp=Math.min(82,Math.max(18,q.crowdUp+(Math.random()-.5)*2)); if(Math.random()<.4)q.traders+=Math.ceil(Math.random()*3);});},3000);
 
 function renderQuestions(){
   const risk=riskAmt();
@@ -471,7 +493,11 @@ function renderQuestions(){
     return `<div class="qcard ${done?'done':''}">
       <div class="qhead">
         <div class="qtitle">Will ${NAME[c]} touch <b class="pup">${fp(c,q.upT)}</b> or <b class="pdn">${fp(c,q.dnT)}</b> first ${q.tf.when}?</div>
-        <div class="cdpill"><span class="tag">${q.tf.tag}</span><span class="tm" data-cd="${q.tf.at}">—</span></div>
+        ${done?'':`<div class="qmeta">
+          <div class="qm-row"><span class="qm-lb">Ends in</span><span class="qm-tm" data-cd="${q.tf.at}">—</span></div>
+          <div class="qm-div"></div>
+          <div class="qm-row"><svg class="cmeter" viewBox="0 0 28 17"><path class="mb" d="M2,15 A12,12 0 0 1 26,15"/><path class="md" data-md="${q.id}" d="M2,15 A12,12 0 0 1 26,15"/><path class="mu" data-mu="${q.id}" d="M26,15 A12,12 0 0 0 2,15"/></svg><span class="ct" data-ct="${q.id}"></span></div>
+        </div>`}
       </div>
       ${done
         ? `<div class="resolved">Finished — ${q.resolvedSide==='up'?'UP side won ('+fp(c,q.upT)+')':'DOWN side won ('+fp(c,q.dnT)+')'}</div>`
@@ -482,11 +508,11 @@ function renderQuestions(){
           </div>
           <div class="acts">
             <button class="act short" onclick="openQ('${q.id}','short')">
-              <span class="r1"><span class="lbl">↓ DOWN</span><span class="ratio" data-srx="${q.id}"></span></span>
+              <span class="r1"><span class="lbl">↓ DOWN</span><span class="more" data-sm="${q.id}" hidden>Wins more</span></span>
               <span class="r2"><span class="tp">${fp(c,q.dnT)}</span><span class="win" data-sw="${q.id}"></span></span>
             </button>
             <button class="act long" onclick="openQ('${q.id}','long')">
-              <span class="r1"><span class="lbl">↑ UP</span><span class="ratio" data-lrx="${q.id}"></span></span>
+              <span class="r1"><span class="lbl">↑ UP</span><span class="more" data-lm="${q.id}" hidden>Wins more</span></span>
               <span class="r2"><span class="tp">${fp(c,q.upT)}</span><span class="win" data-lw="${q.id}"></span></span>
             </button>
           </div>`}
@@ -505,8 +531,14 @@ function updateBars(){
     lv.style.left=Math.min(88,Math.max(12,x))+'%'; lv.textContent=fp(q.coin,qt.p);
     document.querySelector(`[data-sw="${q.id}"]`).textContent='Win '+money0(qt.shortWin);
     document.querySelector(`[data-lw="${q.id}"]`).textContent='Win '+money0(qt.longWin);
-    document.querySelector(`[data-srx="${q.id}"]`).textContent=ratioTxt(qt.shortWin,risk);
-    document.querySelector(`[data-lrx="${q.id}"]`).textContent=ratioTxt(qt.longWin,risk);
+    document.querySelector(`[data-sm="${q.id}"]`).hidden = !(qt.shortWin > qt.longWin+1);
+    document.querySelector(`[data-lm="${q.id}"]`).hidden = !(qt.longWin > qt.shortWin+1);
+    const cu=q.crowdUp, upMaj=cu>=50, maj=Math.round(upMaj?cu:100-cu), L=37.7;
+    document.querySelector(`[data-md="${q.id}"]`).setAttribute('stroke-dasharray',`${(100-cu)/100*L} ${L}`);
+    document.querySelector(`[data-mu="${q.id}"]`).setAttribute('stroke-dasharray',`${cu/100*L} ${L}`);
+    const ct=document.querySelector(`[data-ct="${q.id}"]`);
+    ct.textContent=`${q.traders} traders · ${maj}% ${upMaj?'Up':'Down'}`;
+    ct.className='ct '+(upMaj?'up':'dn');
   });
 }
 function checkQuestions(){
@@ -578,7 +610,8 @@ function renderSummary(){
   const tp=isL?q.upT:q.dnT, sl=isL?q.dnT:q.upT;
   const size=isL?qt.longSize:qt.shortSize, win=isL?qt.longWin:qt.shortWin;
   tw.textContent='+'+money0(win); tw.style.color='var(--green)';
-  tr.textContent='Ratio '+ratioTxt(win,risk);
+  const cu=q.crowdUp, upMaj=cu>=50;
+  tr.textContent=`${Math.round(upMaj?cu:100-cu)}% of ${q.traders} traders chose ${upMaj?'Up':'Down'}`;
   det.innerHTML=`<div class="row"><span>Order</span><b class="${isL?'g':'r'}">${isL?'LONG':'SHORT'} ${money0(size)} ${c}-PERP</b></div>
     <div class="row"><span>Take profit</span><b class="g">${fp(c,tp)}</b></div>
     <div class="row"><span>Stop loss</span><b class="r">${fp(c,sl)}</b></div>
