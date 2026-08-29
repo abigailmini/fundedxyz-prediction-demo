@@ -429,10 +429,19 @@ const TFS=[
   {pct:.01, label:'±1% · Today',tag:'TODAY',   when:'by today, Aug 29',at:+eod},
   {pct:.02, label:'±2% · 3D',   tag:'SEP 1',   when:'by Sep 1',        at:+sep1}
 ];
+/* round targets to clean levels: UP target rounds up, DOWN target rounds down,
+   step sized to the band so levels read like real support/resistance */
+const NICE=[5000,2500,1000,500,250,100,50,25,10,5,2.5,1,0.5,0.25,0.1,0.05,0.025,0.01,0.005,0.0025,0.001,0.0005,0.00025,0.0001];
+function niceStep(d){const lim=d*0.8;for(const n of NICE){if(n<=lim)return n;}return NICE[NICE.length-1];}
 const QUESTIONS=[];
 for(const coin of Object.keys(state.prices)){
   const a=state.prices[coin];
-  TFS.forEach((tf,i)=>QUESTIONS.push({id:coin+'-q'+i,coin,tf,anchor:a,upT:a*(1+tf.pct),dnT:a*(1-tf.pct),status:'open',crowdUp:50+(Math.random()<.5?-1:1)*(8+Math.random()*22),traders:Math.round([180,320,520,380][i]*(0.6+Math.random()*0.9))}));
+  TFS.forEach((tf,i)=>{
+    const dist=a*tf.pct, step=niceStep(dist);
+    const upT=+(Math.ceil((a+dist)/step)*step).toFixed(6);
+    const dnT=+(Math.floor((a-dist)/step)*step).toFixed(6);
+    QUESTIONS.push({id:coin+'-q'+i,coin,tf,anchor:a,upT,dnT,status:'open',crowdUp:50+(Math.random()<.5?-1:1)*(8+Math.random()*22),traders:Math.round([180,320,520,380][i]*(0.6+Math.random()*0.9))});
+  });
 }
 
 const fmt=(n,d)=>n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
