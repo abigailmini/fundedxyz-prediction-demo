@@ -140,8 +140,8 @@ a{color:inherit;text-decoration:none}
 .race{position:relative;height:46px;margin:6px 4px 0}
 .race .rail{position:absolute;left:0;right:0;top:27px;height:9px;border-radius:99px;overflow:hidden;background:linear-gradient(90deg,rgba(231,76,60,.45),rgba(231,76,60,.10) 38%,rgba(255,255,255,.05) 50%,rgba(0,212,170,.10) 62%,rgba(0,212,170,.45))}
 .race .anchor{position:absolute;left:50%;top:24px;width:2px;height:15px;background:rgba(255,255,255,.22);border-radius:2px}
-.race .dot{position:absolute;top:26px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(168,85,240,.9),0 0 14px rgba(168,85,240,.8);transform:translateX(-50%);transition:left .25s linear;z-index:2}
-.race .pxpill{position:absolute;top:2px;transform:translateX(-50%);background:#17121f;border:1px solid rgba(168,85,240,.5);border-radius:6px;padding:2px 9px;font-family:var(--mono);font-size:11px;font-weight:600;transition:left .25s linear;white-space:nowrap;z-index:2}
+.race .dot{position:absolute;top:26px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(168,85,240,.9),0 0 14px rgba(168,85,240,.8);transform:translateX(-50%);transition:left .85s linear;z-index:2}
+.race .pxpill{position:absolute;top:2px;transform:translateX(-50%);background:#17121f;border:1px solid rgba(168,85,240,.5);border-radius:6px;padding:2px 9px;font-family:var(--mono);font-size:11px;font-weight:600;transition:left .85s linear;white-space:nowrap;z-index:2}
 
 /* action buttons — clean anatomy, no collisions */
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
@@ -249,7 +249,7 @@ canvas{width:100%;height:300px;display:block}
 .ptrack .caps .l.g{color:var(--green)}.ptrack .caps .r.rr{color:var(--red)}
 .prail{position:relative;height:10px;border-radius:99px;background:linear-gradient(90deg,rgba(231,76,60,.4),rgba(255,255,255,.05) 45%,rgba(255,255,255,.05) 55%,rgba(0,212,170,.4))}
 .prail.flip{background:linear-gradient(90deg,rgba(0,212,170,.4),rgba(255,255,255,.05) 45%,rgba(255,255,255,.05) 55%,rgba(231,76,60,.4))}
-.prail .dot{position:absolute;top:-2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(168,85,240,.9),0 0 12px rgba(168,85,240,.7);transform:translateX(-50%);transition:left .25s linear}
+.prail .dot{position:absolute;top:-2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(168,85,240,.9),0 0 12px rgba(168,85,240,.7);transform:translateX(-50%);transition:left .85s linear}
 .term{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--text2);border-top:1px dashed var(--border);padding-top:10px}
 .term b{color:var(--text);font-weight:600}
 .term .long{color:var(--green)}.term .short{color:var(--red)}
@@ -450,15 +450,21 @@ function quote(q,risk){
   return {p,upDist,dnDist,longSize,longWin,shortSize,shortWin,longChance:dnDist/(upDist+dnDist)};
 }
 
+function priceStep(){
+  const r=(Math.random()+Math.random()+Math.random()-1.5)/1.5;   // ~gaussian in [-1,1]
+  let v=0.00012;                                                  // typical $3–8 move on BTC
+  if(Math.random()<0.12) v*=3.5;                                  // occasional $15–30 pop
+  return r*v;
+}
 setInterval(()=>{
   for(const c of Object.keys(state.prices)){
-    state.prices[c]=Math.max(1e-6,state.prices[c]*(1+(Math.random()-.5)*VOL));
+    state.prices[c]=Math.max(1e-6,state.prices[c]*(1+priceStep()));
     const h=state.hist[c]; h.push(state.prices[c]); if(h.length>420)h.shift();
   }
   updateBars();
   if(state.activeQ) renderDetailLive();
   checkQuestions(); checkPositions(); renderPositionsLive();
-},120);
+},1000);
 
 function cdTxt(at){
   let s=Math.max(0,Math.floor((at-Date.now())/1000));
@@ -754,7 +760,7 @@ function toast(msg,kind){
 }
 
 for(let i=0;i<140;i++)for(const c of Object.keys(state.prices)){
-  state.prices[c]*=1+(Math.random()-.5)*VOL*3;
+  state.prices[c]*=1+priceStep();
   state.hist[c].push(state.prices[c]);
 }
 for(const c of Object.keys(state.open)){state.prices[c]=state.open[c];state.hist[c].push(state.open[c]);}
