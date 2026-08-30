@@ -137,27 +137,27 @@ a{color:inherit;text-decoration:none}
 
 /* race track — signature element */
 .race{position:relative;height:46px;margin:6px 4px 0}
-.race .rail{position:absolute;left:0;right:0;top:27px;height:9px;border-radius:99px;overflow:hidden;background:linear-gradient(90deg,rgba(231,76,60,.45),rgba(231,76,60,.10) 38%,rgba(255,255,255,.05) 50%,rgba(0,212,170,.10) 62%,rgba(0,212,170,.45))}
+.race .rail{position:absolute;left:0;right:0;top:27px;height:10px;border-radius:99px;overflow:hidden;background:linear-gradient(90deg,rgba(231,76,60,.85),rgba(231,76,60,.18) 40%,rgba(255,255,255,.06) 50%,rgba(0,212,170,.18) 60%,rgba(0,212,170,.85))}
 .race .anchor{position:absolute;left:50%;top:24px;width:2px;height:15px;background:rgba(255,255,255,.22);border-radius:2px}
 .race .dot{position:absolute;top:26px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(168,85,240,.9),0 0 14px rgba(168,85,240,.8);transform:translateX(-50%);transition:left .85s linear;z-index:2}
 .race .pxpill{position:absolute;top:2px;transform:translateX(-50%);background:#17121f;border:1px solid rgba(168,85,240,.5);border-radius:6px;padding:2px 9px;font-family:var(--mono);font-size:11px;font-weight:600;transition:left .85s linear;white-space:nowrap;z-index:2}
 
 /* action buttons — clean anatomy, no collisions */
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
-.act{border-radius:var(--rs);border:1px solid;padding:10px 13px;display:flex;flex-direction:column;gap:4px;background:rgba(255,255,255,.02);transition:.13s;text-align:left}
+.act{border-radius:var(--rs);border:1px solid;padding:13px 16px;display:flex;flex-direction:row;justify-content:space-between;align-items:center;gap:10px;background:rgba(255,255,255,.02);transition:.13s;text-align:left}
 .act .r1{display:flex;justify-content:space-between;align-items:center}
 .act .lbl{font-size:10px;font-weight:700;letter-spacing:.13em}
 .act .ch{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
 .act .r2{display:flex;justify-content:space-between;align-items:baseline}
-.act .tp{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--text2)}
+.act .tp{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.01em}
 .act .win{font-family:var(--mono);font-size:18px;font-weight:800;letter-spacing:-.01em}
 .act .win{color:var(--text)}
-.act.short{border-color:rgba(231,76,60,.35)}
-.act.short .lbl{color:var(--red)}
-.act.short:hover{background:var(--red-soft);border-color:var(--red)}
-.act.long{border-color:rgba(0,212,170,.35)}
-.act.long .lbl{color:var(--green)}
-.act.long:hover{background:var(--green-soft);border-color:var(--green)}
+.act.short{border-color:rgba(231,76,60,.55);background:linear-gradient(90deg,rgba(231,76,60,.26),rgba(231,76,60,.06) 72%)}
+.act.short .lbl{color:#ffa196;font-size:11px}
+.act.short:hover{background:linear-gradient(90deg,rgba(231,76,60,.38),rgba(231,76,60,.10) 72%);border-color:var(--red);box-shadow:0 4px 18px rgba(231,76,60,.25)}
+.act.long{border-color:rgba(0,212,170,.55);background:linear-gradient(90deg,rgba(0,212,170,.06) 28%,rgba(0,212,170,.26))}
+.act.long .lbl{color:#5cf5d3;font-size:11px}
+.act.long:hover{background:linear-gradient(90deg,rgba(0,212,170,.10) 28%,rgba(0,212,170,.38));border-color:var(--green);box-shadow:0 4px 18px rgba(0,212,170,.25)}
 .act.sel.short{background:var(--red-soft);border-color:var(--red);box-shadow:0 0 0 3px rgba(231,76,60,.12)}
 .act.sel.long{background:var(--green-soft);border-color:var(--green);box-shadow:0 0 0 3px rgba(0,212,170,.12)}
 .resolved{font-family:var(--mono);font-size:12px;color:var(--muted);padding:6px 2px}
@@ -526,12 +526,10 @@ function renderQuestions(){
           </div>
           <div class="acts">
             <button class="act short" onclick="openQ('${q.id}','short')">
-              <span class="r1"><span class="lbl">↓ DOWN</span></span>
-              <span class="r2"><span class="tp">${fp(c,q.dnT)}</span><span class="win" data-sw="${q.id}"></span></span>
+              <span class="lbl">↓ DOWN</span><span class="tp">${fp(c,q.dnT)}</span>
             </button>
             <button class="act long" onclick="openQ('${q.id}','long')">
-              <span class="r1"><span class="lbl">↑ UP</span></span>
-              <span class="r2"><span class="tp">${fp(c,q.upT)}</span><span class="win" data-lw="${q.id}"></span></span>
+              <span class="lbl">↑ UP</span><span class="tp">${fp(c,q.upT)}</span>
             </button>
           </div>`}
     </div>`;
@@ -547,8 +545,6 @@ function updateBars(){
     dot.style.left=x+'%';
     const lv=document.querySelector(`[data-live="${q.id}"]`);
     lv.style.left=Math.min(88,Math.max(12,x))+'%'; lv.textContent=fp(q.coin,qt.p);
-    document.querySelector(`[data-sw="${q.id}"]`).textContent='Win '+money0(qt.shortWin);
-    document.querySelector(`[data-lw="${q.id}"]`).textContent='Win '+money0(qt.longWin);
     const cu=q.crowdUp, upMaj=cu>=50, maj=Math.round(upMaj?cu:100-cu), L=37.7;
     document.querySelector(`[data-md="${q.id}"]`).setAttribute('stroke-dasharray',`${(100-cu)/100*L} ${L}`);
     document.querySelector(`[data-mu="${q.id}"]`).setAttribute('stroke-dasharray',`${cu/100*L} ${L}`);
